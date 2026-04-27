@@ -1,0 +1,21 @@
+# OS
+.DS_Store
+
+# Claude Code local state
+.claude/local/
+.claude/session/
+
+# Node
+node_modules/
+.turbo/
+.next/
+.tanstack/
+dist/
+build/
+
+# Env
+.env
+.env.local
+
+# Postgres data
+data/postgres/
