@@ -1,79 +1,67 @@
 ---
 name: to-issues
-description: Break a plan, spec, or PRD into independently-grabbable GitHub issues using tracer-bullet vertical slices. Use when user wants to convert a plan into issues, create implementation tickets, or break down work into issues.
+description: Split the active app seed issue into FE/BE sub-issues based on the SDD. Each gets labels feature:<slug>, role:app, and area:fe or area:be. Use when user says "/split-issue".
+disable-model-invocation: true
 ---
 
-# To Issues
+# Split App Seed → FE/BE Sub-Issues
 
-Break a plan into independently-grabbable GitHub issues using vertical slices (tracer bullets).
+You are in the **app** repo. The user has a seed issue open (auto-created by dispatch) and an SDD written. Split the work.
+
+## Sub-issue characteristics
+
+Each sub-issue should:
+- Be **vertically sliced** for FE (one user-visible outcome).
+- Be **horizontally sliced** for BE (one endpoint, one job, one schema change).
+- Be **independently testable**.
+- Have an explicit `area:fe` OR `area:be` label.
+
+## Required labels
+
+Every sub-issue MUST have:
+- `feature:<slug>` (same as seed)
+- `role:app`
+- `area:fe` OR `area:be` (exactly one)
+- `feature` (bare, for project)
+
+## Required body
+
+```markdown
+## Context
+Sub-task of the app seed: meetup-cms-app#<seed-number>
+SDD: docs/sdd/<slug>.md
+Feature: meetup-cms-product PRD <link>
+
+## Acceptance Criteria
+- <specific, testable behavior>
+
+## Technical Notes
+- <data model, API contract, perf budget — referenced from SDD>
+```
 
 ## Process
 
-### 1. Gather context
+1. Read the seed issue (`gh issue view <number>`).
+2. Read the SDD (`docs/sdd/<slug>.md`).
+3. Propose sub-issues, separating FE from BE:
+   - BE first (data model + API + jobs).
+   - FE second (UI components, state mgmt, screen wiring).
+4. Show the user the proposed split.
+5. For each accepted sub-issue:
+   ```bash
+   AREA_LABEL="area:fe"  # or area:be
+   ISSUE_URL=$(gh issue create \
+     --repo horvat-ivan/meetup-cms-app \
+     --title "[$AREA_LABEL] <title>" \
+     --body "<body>" \
+     --label "feature:<slug>,role:app,$AREA_LABEL,feature")
+   gh project item-add 1 --owner horvat-ivan --url "$ISSUE_URL"
+   ```
+6. Comment on the seed listing the sub-issues.
+7. Report back to user.
 
-Work from whatever is already in the conversation context. If the user passes a GitHub issue number or URL as an argument, fetch it with `gh issue view <number>` (with comments).
+## What you NEVER do
 
-### 2. Explore the codebase (optional)
-
-If you have not already explored the codebase, do so to understand the current state of the code.
-
-### 3. Draft vertical slices
-
-Break the plan into **tracer bullet** issues. Each issue is a thin vertical slice that cuts through ALL integration layers end-to-end, NOT a horizontal slice of one layer.
-
-Slices may be 'HITL' or 'AFK'. HITL slices require human interaction, such as an architectural decision or a design review. AFK slices can be implemented and merged without human interaction. Prefer AFK over HITL where possible.
-
-<vertical-slice-rules>
-- Each slice delivers a narrow but COMPLETE path through every layer (schema, API, UI, tests)
-- A completed slice is demoable or verifiable on its own
-- Prefer many thin slices over few thick ones
-</vertical-slice-rules>
-
-### 4. Quiz the user
-
-Present the proposed breakdown as a numbered list. For each slice, show:
-
-- **Title**: short descriptive name
-- **Type**: HITL / AFK
-- **Blocked by**: which other slices (if any) must complete first
-- **User stories covered**: which user stories this addresses (if the source material has them)
-
-Ask the user:
-
-- Does the granularity feel right? (too coarse / too fine)
-- Are the dependency relationships correct?
-- Should any slices be merged or split further?
-- Are the correct slices marked as HITL and AFK?
-
-Iterate until the user approves the breakdown.
-
-### 5. Create the GitHub issues
-
-For each approved slice, create a GitHub issue using `gh issue create`. Use the issue body template below.
-
-Create issues in dependency order (blockers first) so you can reference real issue numbers in the "Blocked by" field.
-
-<issue-template>
-## Parent
-
-#<parent-issue-number> (if the source was a GitHub issue, otherwise omit this section)
-
-## What to build
-
-A concise description of this vertical slice. Describe the end-to-end behavior, not layer-by-layer implementation.
-
-## Acceptance criteria
-
-- [ ] Criterion 1
-- [ ] Criterion 2
-- [ ] Criterion 3
-
-## Blocked by
-
-- Blocked by #<issue-number> (if any)
-
-Or "None - can start immediately" if no blockers.
-
-</issue-template>
-
-Do NOT close or modify any parent issue.
+- Create sub-issues in design or product.
+- Create a sub-issue without `area:fe` or `area:be`.
+- Skip the project board add.
