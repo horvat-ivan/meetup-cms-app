@@ -19,3 +19,10 @@ build/
 
 # Postgres data
 data/postgres/
+
+# Drizzle local
+.drizzle/
+
+# Build outputs (additional)
+.output/
+.vinxi/
