@@ -1,19 +1,33 @@
 # meetup-cms-app
 
-The **app** repo in the Meetup CMS multirepo workflow. This is where production code lives.
+Engineering repo for the Meetup CMS demo. Built with TanStack Start (FE) + NestJS (BE) + Postgres + Drizzle.
 
-## Quickstart for developers
+## Quickstart
 
-(Coming in Plan 3 — once the app shell is scaffolded.)
+```bash
+# 1. Install
+pnpm install
 
-For now, this repo only contains role-aware Claude Code tooling.
+# 2. Start Postgres
+docker-compose up -d
+
+# 3. Migrate + seed
+cp .env.example .env
+pnpm db:migrate
+pnpm db:seed
+
+# 4. Run both apps
+pnpm dev
+```
+
+- FE: http://localhost:3000
+- API: http://localhost:4000
 
 ## Stack
 
-- FE: TanStack Start
-- BE: NestJS
-- DB: Postgres (via docker-compose)
-- ORM: Drizzle
+- FE: TanStack Start, React 19, Tailwind v4
+- BE: NestJS 11, Drizzle ORM
+- DB: Postgres 16 (docker)
 - Workspace: pnpm + turbo
 
 ## Spec
